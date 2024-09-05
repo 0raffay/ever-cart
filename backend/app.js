@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
 const port = process.env.PORT;
 
 function authenticateToken(req, res, next) {
@@ -27,6 +28,7 @@ function authenticateToken(req, res, next) {
 /**
  * Middleware
  */
+app.use(cors());
 app.use(express.json())
 app.use(authenticateToken);
 
