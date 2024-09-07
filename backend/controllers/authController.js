@@ -50,7 +50,6 @@ async function register(req, res) {
   }
 
   const [users] = await database.query("SELECT * FROM users");
-  console.log("users", users);
 
   const usernameExists = users.some((user) => {
     return user?.username == username;

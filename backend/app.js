@@ -16,7 +16,7 @@ function authenticateToken(req, res, next) {
 
   if (!token) return res.sendStatus(401);
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) return res.sendStatus(403);
 
     req.user = user;
@@ -38,6 +38,12 @@ app.use(authenticateToken);
 
 app.use("/", require("./routes/root"));
 app.use('/auth', require("./routes/auth"))
+app.use('/products', require("./routes/products"))
+app.use('/categories', require("./routes/categories"))
+app.use('/brands', require("./routes/brands"))
+app.use('/roles', require("./routes/roles"))
+app.use('/permissions', require("./routes/permissions"))
+app.use('/users', require("./routes/users"))
 
 /**
  * Basic setup
