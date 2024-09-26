@@ -1,21 +1,21 @@
-import React, { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { ROUTES } from "@/routes";
 import { useAppSelector } from "@/app/hooks";
 import { selectIsAuthenticated } from "@/app/features/auth/authSlice";
+import Layout from "./Layout";
 
-interface ProtectedRouteProps {
-  children: ReactNode;
-}
-
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+const ProtectedRoute = () => {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   if (!isAuthenticated) {
     return <Navigate to={ROUTES.login} />;
   }
 
-  return <>{children}</>;
+  return (
+    <Layout>
+      <Outlet />
+    </Layout>
+  );
 };
 
 export default ProtectedRoute;

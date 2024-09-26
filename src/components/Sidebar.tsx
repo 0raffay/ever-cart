@@ -17,7 +17,7 @@ interface SidebarProps {
 export function Sidebar({ items }: SidebarProps) {
   const dispatch = useAppDispatch();
   const openIndex = useAppSelector(selectOpenItem("sidebar"));
-console.log('open item', openIndex)
+  console.log("open item", openIndex);
   const handleToggle = (index: number) => {
     dispatch(toggleItem({ key: "sidebar", index }));
   };
@@ -42,7 +42,9 @@ console.log('open item', openIndex)
           )}
         </div>
       ))}
-      <Button onClick={()=> dispatch(logout())}>Logout <PersonIcon/> </Button>
+      <Button onClick={() => dispatch(logout())}>
+        Logout <PersonIcon />{" "}
+      </Button>
     </div>
   );
 }
