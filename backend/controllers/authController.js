@@ -17,7 +17,7 @@ async function login(req, res) {
 
   const [users] = await database.query('SELECT * FROM users WHERE username = ? AND password = ?', [username, password]);
   if (!users?.length) {
-    res.status(401).json({ message: "User not found", data: false });
+    res.status(400).json({ message: "User not found", data: false });
     return;
   }
   const user = users[0];

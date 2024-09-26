@@ -7,11 +7,6 @@ const cors = require('cors');
 const port = process.env.PORT;
 
 function authenticateToken(req, res, next) {
-  const path = req.path;
-  if (path === '/auth/login' || path === '/auth/register' || path == "/auth/refresh-token" || path == "/auth/revoke-token") {
-    return next();
-  }
-
   const token = req.headers['authorization']?.split(' ')[1];
 
   if (!token) return res.sendStatus(401);
@@ -30,7 +25,6 @@ function authenticateToken(req, res, next) {
  */
 app.use(cors());
 app.use(express.json())
-app.use(authenticateToken);
 
 /**
  * Routes
