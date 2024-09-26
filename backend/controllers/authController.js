@@ -71,9 +71,13 @@ async function register(req, res) {
 VALUES (?, ?, ?);
 `
 
-  const response = await database.query(query, [username, email, password])
+  const cartQuery = `INSERT INTO carts (user_id, created_at, updated_at) VALUES (?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+`
 
-  if (!response) {
+  const response = await database.query(query, [username, email, password])
+  const cartResponse = await database.query(cartQuery, [response?.[0]?.insertId])
+
+  if (!response || !cartResponse) {
     res.status(500).json({ message: 'Something Went Wrong while registering!', data: false });
   }
 

@@ -38,6 +38,7 @@ app.use('/brands', require("./routes/brands"))
 app.use('/roles', require("./routes/roles"))
 app.use('/permissions', require("./routes/permissions"))
 app.use('/users', require("./routes/users"))
+app.use('/cart', require("./routes/cart"))
 
 /**
  * Basic setup
