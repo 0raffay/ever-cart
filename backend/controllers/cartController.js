@@ -1,12 +1,14 @@
 const { validate } = require('../helpers');
 const database = require('../database');
+const { promise } = require('zod');
+const { getSingleProductById } = require('./productController');
 
 
 const getUserCart = async (req, res) => {
   const { user_id } = req.params;
 
   try {
-    const checkCartQuery = `SELECT id FROM carts WHERE user_id = ?`;
+    const checkCartQuery = `SELECT id FROM carts WHERE user_id = ? AND is_active != 0`;
     const [[cart]] = await database.query(checkCartQuery, [user_id]);
 
     if (!cart) {
@@ -159,5 +161,38 @@ const removeAllItemsFromCart = async (req, res) => {
   }
 };
 
+const calculateCartTotal = async (cart_id) => {
+  const cart = await getCartItems(cart_id);
 
-module.exports = { addOrUpdateCartItem, addToCart, updateCartItem, getUserCart, deleteProductFromCart, removeAllItemsFromCart };
+  const amount = cart?.reduce((total, item) => {
+    const quantity = item?.quantity ? parseInt(item?.quantity, 10) : 0;
+    const price = item?.product?.price ? parseFloat(item?.product?.price) : 0;
+
+    return total + (quantity * price);
+  }, 0);
+
+  return amount;
+};
+
+const getUserCartById = async (user_id) => {
+  const query = `SELECT * FROM  carts WHERE user_id = ? AND is_active != 0`;
+  const [[rows]] = await database.query(query, [user_id]);
+  return rows || 0;
+}
+
+
+const getCartItems = async (cart_id) => {
+  const query = `SELECT * FROM cart_items WHERE cart_id = ?`;
+  const [items] = await database.query(query, [cart_id]);
+  const itemsWithProducts = await Promise.all(items?.map(item => {
+    return getSingleProductById(item?.id);
+  }))
+  return items?.map((item, index) => {
+    return {
+      ...item,
+      product: itemsWithProducts?.[index]
+    }
+  }) || 0;
+}
+
+module.exports = { calculateCartTotal, addOrUpdateCartItem, addToCart, updateCartItem, getUserCart, deleteProductFromCart, removeAllItemsFromCart, getUserCartById };

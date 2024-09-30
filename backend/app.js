@@ -7,14 +7,6 @@ const cors = require('cors');
 const port = process.env.PORT;
 
 function authenticateToken(req, res, next) {
-<<<<<<< HEAD
-  const path = req.path;
-  if (path === '/auth/login' || path === '/auth/register' || path == "/auth/refresh-token" || path == "/auth/revoke-token" || path == "/") {
-    return next();
-  }
-
-=======
->>>>>>> 9d5927d5d4bff8515bd369cd51fde448dc0b78eb
   const token = req.headers['authorization']?.split(' ')[1];
 
   if (!token) return res.sendStatus(401);
@@ -47,6 +39,8 @@ app.use('/roles', require("./routes/roles"))
 app.use('/permissions', require("./routes/permissions"))
 app.use('/users', require("./routes/users"))
 app.use('/cart', require("./routes/cart"))
+app.use('/order-statuses', require("./routes/orderStatus"))
+app.use('/orders', require("./routes/orders"))
 
 /**
  * Basic setup

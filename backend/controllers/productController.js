@@ -77,34 +77,40 @@ const addProduct = async (req, res) => {
 };
 
 const getSingleProduct = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   console.log('req', req);
 
-  try { 
+  try {
     const query = 'SELECT * FROM products WHERE id = ?';
     const [rows] = await database.query(query, [id]);
     console.log("rows", rows)
-    if(rows) {
-      res.status(201).json({message: "Single Product", result: !!rows?.length, data: rows?.[0] || {}})
+    if (rows) {
+      res.status(201).json({ message: "Single Product", result: !!rows?.length, data: rows?.[0] || {} })
     }
   } catch (error) {
-    res.status(500).json({message: "Something went wrong", result: false})
+    res.status(500).json({ message: "Something went wrong", result: false })
     console.error("erorr", error);
   }
 }
 
 const deleteProduct = async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   try {
     const query = "DELETE FROM products WHERE id = ?"
     const [rows] = await database.query(query, [id]);
-    if(rows) {
-      res.status(200).json({message: "Product Deleted", result: true})
+    if (rows) {
+      res.status(200).json({ message: "Product Deleted", result: true })
     }
   } catch (error) {
-    res.status(500).json({message: "Something went wrong", result: false})
-    console.error("error", error); 
+    res.status(500).json({ message: "Something went wrong", result: false })
+    console.error("error", error);
   }
 }
 
-module.exports = { addProduct, getAllProducts, getSingleProduct, deleteProduct };
+const getSingleProductById = async (id) => {
+  const query = 'SELECT * FROM products WHERE id = ?';
+  const [rows] = await database.query(query, [id]);
+  return rows?.[0] || 0
+}
+
+module.exports = { addProduct, getAllProducts, getSingleProduct, deleteProduct, getSingleProductById };
