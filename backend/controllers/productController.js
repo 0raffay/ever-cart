@@ -76,4 +76,35 @@ const addProduct = async (req, res) => {
   }
 };
 
-module.exports = { addProduct, getAllProducts };
+const getSingleProduct = async (req, res) => {
+  const {id} = req.params;
+  console.log('req', req);
+
+  try { 
+    const query = 'SELECT * FROM products WHERE id = ?';
+    const [rows] = await database.query(query, [id]);
+    console.log("rows", rows)
+    if(rows) {
+      res.status(201).json({message: "Single Product", result: !!rows?.length, data: rows?.[0] || {}})
+    }
+  } catch (error) {
+    res.status(500).json({message: "Something went wrong", result: false})
+    console.error("erorr", error);
+  }
+}
+
+const deleteProduct = async (req, res) => {
+  const {id} = req.params;
+  try {
+    const query = "DELETE FROM products WHERE id = ?"
+    const [rows] = await database.query(query, [id]);
+    if(rows) {
+      res.status(200).json({message: "Product Deleted", result: true})
+    }
+  } catch (error) {
+    res.status(500).json({message: "Something went wrong", result: false})
+    console.error("error", error); 
+  }
+}
+
+module.exports = { addProduct, getAllProducts, getSingleProduct, deleteProduct };

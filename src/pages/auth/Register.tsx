@@ -3,69 +3,120 @@ import { useForm } from "react-hook-form";
 import { registerSchema } from "@/schemas/registerSchema";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { FormFieldComponent } from "@/components/FieldComponent";
 import { useRegisterMutation } from "@/app/services/authApi";
 import { useToast } from "@/hooks/use-toast";
+import { Link, useNavigate } from "react-router-dom";
+import { ROUTES } from "@/routes";
+import { useRef } from "react";
 
 export default function Register() {
-  const { toast } = useToast()
+  const [register, { isLoading }] = useRegisterMutation();
+  const navigate = useNavigate();
 
-	const registerForm = useForm<z.infer<typeof registerSchema>>({
-		resolver: zodResolver(registerSchema),
-	});
+  const { toast } = useToast();
 
-  const [register, {isLoading}] = useRegisterMutation() 
+  const registerForm = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
+  });
 
-	async function onSubmit(values: z.infer<typeof registerSchema>) {
-		console.log(values);
+
+  // Define refs for each input
+  const userNameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  async function onSubmit() {
+    const username = userNameRef.current?.value;
+    const email = emailRef.current?.value;
+    const password = passwordRef.current?.value;
+
+    if (!username || !email || !password) {
+      toast({
+        title: "Please fill the required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      const response = await register({email: "something", password: "", username: "0"});
-      console.log('repsonse', response)
+       await register({
+        email,
+        password,
+        username,
+      });
+      toast({
+        title: "Account Created Successfully.",
+        variant: "success",
+      });
+      navigate(ROUTES.home);
     } catch (error) {
       toast({
         title: JSON.stringify(error),
-        variant: "destructive"
-      })
-
+        variant: "destructive",
+      });
     }
+  }
 
-	}
-
-	return (
-		<div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-			<div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
-				<h1 className="text-2xl font-bold mb-6 text-center">Sign Up</h1>
-        <Form {...registerForm}>
-					<form onSubmit={registerForm.handleSubmit(onSubmit)} className="space-y-4">
-						<FormFieldComponent
-							name="username"
-							label="Username"
-							placeholder="Enter your username"
-							control={registerForm.control}
-							render={(field) => <Input {...field} placeholder="Enter your username" />}
-						/>
-						<FormFieldComponent
-							name="email"
-							label="Email"
-							placeholder="Enter your email"
-							control={registerForm.control}
-							render={(field) => <Input type="email" {...field} placeholder="Enter your email" />}
-						/>
-						<FormFieldComponent
-							name="password"
-							label="Password"
-							placeholder="Enter your password"
-							control={registerForm.control}
-							render={(field) => <Input type="password" {...field} placeholder="Enter your password" />}
-						/>
-						<Button isLoading={isLoading} type="submit" >
-							Sign Up
-						</Button>
-					</form>
-				</Form>
-			</div>
-		</div>
-	);
+  return (
+    <div className="min-h-screen w-full flex items-center justify-center">
+      <div className="form_wrap">
+        <h1 className="lg:text-[45px] text-[25px] font-bold text-black uppercase text-center lg:mb-5 mb-4">
+          Sign Up
+        </h1>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit();
+          }}
+          className="flex items-center flex-col gap-4 justify-center mb-3"
+        >
+          <div className="input_wrap">
+            <Input
+              variant="tertiary"
+              size="md"
+              placeholder="Email"
+              type="email"
+              className="lg:min-w-[400px] w-full"
+              ref={emailRef}
+            />
+          </div>
+          <div className="input_wrap">
+            <Input
+              variant="tertiary"
+              size="md"
+              placeholder="Password"
+              type="password"
+              className="lg:min-w-[400px] w-full"
+              ref={passwordRef}
+            />
+          </div>
+          <div className="input_wrap">
+            <Input
+              variant="tertiary"
+              size="md"
+              placeholder="Username"
+              type="text"
+              className="lg:min-w-[400px] w-full"
+              ref={userNameRef}
+            />
+          </div>
+          <div>
+            <Button variant="primary" size="md" isLoading={isLoading}>
+              Sign Up
+            </Button>
+          </div>
+        </form>
+        <div className="text-center">
+          if already have an account?
+          <Link
+            className="text-[#555] mx-1 text-[16px] font-bold"
+            to={ROUTES.base}
+          >
+            Sign In
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
 }

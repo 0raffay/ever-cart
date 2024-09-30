@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  font-family: "Poppins", system-ui;
+}
+
+span {
+  display: block;
+}
+
+:is(#about, #contact) img {
+  max-width: 100%;
+  width: 100%;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -34,6 +47,8 @@
     --ring: 215 20.2% 65.1%;
 
     --radius: 0.5rem;
+
+    --section-padding: 60px;
   }
 
   .dark {
@@ -80,7 +95,6 @@
   }
 }
 
-
 .sidebar {
   width: 250px;
   background-color: #f4f4f4;
@@ -95,12 +109,12 @@
   border: none;
   background: none;
   cursor: pointer;
-  color: #000
+  color: #000;
 }
 
 .sidebar-item:hover {
   background-color: #ddd;
-  color: #fff
+  color: #fff;
 }
 
 .sidebar-submenu {
@@ -116,4 +130,150 @@
 
 .sidebar-subitem:hover {
   background-color: #eee;
+}
+
+header ul a {
+  transition: all 300ms ease;
+}
+
+header ul a:hover {
+  opacity: 0.7;
+}
+
+header .active::before {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  right: 50%;
+  transform: translateX(-50%);
+  background-color: #111;
+  width: 70%;
+  height: 3px;
+  border-radius: 10px;
+}
+
+header .mobileWrapper .active::before {
+  display: none;
+}
+
+header .mobileWrapper .active {
+  font-weight: bold;
+  color: #888;
+}
+
+.heading::after {
+  content: "";
+  height: 2px;
+  width: 50px;
+  background-color: #000;
+  margin-left: 5px;
+}
+
+section:not(#shadow-host-companion) {
+  padding-block: var(--section-padding);
+}
+
+/* Style the scroll bar for all webkit browsers (e.g., Chrome, Safari) */
+::-webkit-scrollbar {
+  width: 8px; /* Width of the vertical scrollbar */
+  height: 8px; /* Height of the horizontal scrollbar */
+}
+
+/* Scrollbar track (background) */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Light gray background for the track */
+}
+
+/* Scrollbar thumb (handle) */
+::-webkit-scrollbar-thumb {
+  background-color: #888; /* Darker gray for the handle */
+  border-radius: 10px; /* Rounded corners for the handle */
+  border: 2px solid transparent; /* Optional border to add spacing around the thumb */
+}
+
+/* Hover effect on the scrollbar thumb */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Darker color when hovering over the scrollbar */
+}
+
+/* Firefox scrollbar styling */
+* {
+  scrollbar-width: thin; /* Makes the scrollbar thinner */
+  scrollbar-color: #888 #f1f1f1; /* Sets color of thumb and track */
+}
+
+:where(input, label, span) {
+  display: inline-block;
+}
+
+.custom-table th {
+  font-size: 18px;
+  font-weight: 600;
+  text-align: start;
+  color: #000;
+  border-bottom: 1px solid #99999934;
+  padding-bottom: 10px;
+}
+
+.custom-table tr {
+  padding-block: 30px;
+  border-bottom: 1px solid black;
+}
+
+table td {
+  border-bottom: 1px solid #99999934;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+  font-size: 14px !important;
+  font-weight: bold;
+}
+
+@media only screen and (max-width: 1200px) {
+  :root {
+    --section-padding: 30px;
+  }
+}
+
+@media only screen and (max-width: 1021px) {
+  .custom-table td {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    padding-inline: 0px;
+  }
+
+  .custom-table button {
+    justify-content: flex-end;
+  }
+
+  .custom-table tbody tr {
+    border: none;
+  }
+}
+
+.custom-table {
+  overflow-x: auto;
+}
+
+.custom-table tr th:nth-child(1) {
+  width: 100px;
+}
+
+.custom-table tr th:nth-child(2) {
+  min-width: 200px;
+}
+
+.custom-table tr th:nth-child(3) {
+  min-width: 150px;
+}
+
+.custom-table tr th:nth-child(4) {
+  min-width: 100px;
+}
+
+.custom-table tr th:last-child {
+  min-width: 50px;
+  text-align: end;
 }

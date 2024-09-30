@@ -17,7 +17,7 @@ async function login(req, res) {
 
   const [users] = await database.query('SELECT * FROM users WHERE username = ? AND password = ?', [username, password]);
   if (!users?.length) {
-    res.status(401).json({ message: "User not found", data: false });
+    res.status(400).json({ message: "User not found", data: false });
     return;
   }
   const user = users[0];
@@ -71,9 +71,13 @@ async function register(req, res) {
 VALUES (?, ?, ?);
 `
 
-  const response = await database.query(query, [username, email, password])
+  const cartQuery = `INSERT INTO carts (user_id, created_at, updated_at) VALUES (?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+`
 
-  if (!response) {
+  const response = await database.query(query, [username, email, password])
+  const cartResponse = await database.query(cartQuery, [response?.[0]?.insertId])
+
+  if (!response || !cartResponse) {
     res.status(500).json({ message: 'Something Went Wrong while registering!', data: false });
   }
 
