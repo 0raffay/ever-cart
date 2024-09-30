@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 08, 2024 at 01:00 AM
+-- Generation Time: Sep 30, 2024 at 11:26 PM
 -- Server version: 8.0.39
 -- PHP Version: 8.2.12
 
@@ -31,7 +31,7 @@ CREATE TABLE `brands` (
   `id` int NOT NULL,
   `name` varchar(50) NOT NULL,
   `description` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `brands`
@@ -50,9 +50,17 @@ INSERT INTO `brands` (`id`, `name`, `description`) VALUES
 CREATE TABLE `carts` (
   `id` int NOT NULL,
   `user_id` int NOT NULL,
+  `is_active` int NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `carts`
+--
+
+INSERT INTO `carts` (`id`, `user_id`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 3, 1, '2024-09-26 20:34:09', '2024-09-30 20:21:52');
 
 -- --------------------------------------------------------
 
@@ -66,7 +74,15 @@ CREATE TABLE `cart_items` (
   `product_id` int NOT NULL,
   `quantity` int NOT NULL,
   `added_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `cart_items`
+--
+
+INSERT INTO `cart_items` (`id`, `cart_id`, `product_id`, `quantity`, `added_at`) VALUES
+(3, 1, 4, 2, '2024-09-30 21:04:49'),
+(5, 1, 2, 2, '2024-09-30 21:06:05');
 
 -- --------------------------------------------------------
 
@@ -78,7 +94,7 @@ CREATE TABLE `categories` (
   `id` int NOT NULL,
   `name` varchar(50) NOT NULL,
   `description` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `categories`
@@ -91,6 +107,57 @@ INSERT INTO `categories` (`id`, `name`, `description`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `orders`
+--
+
+CREATE TABLE `orders` (
+  `id` int NOT NULL,
+  `customer_id` int NOT NULL,
+  `cart_id` int NOT NULL,
+  `order_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `status_id` int NOT NULL,
+  `total_amount` decimal(10,2) NOT NULL,
+  `payment_method` varchar(50) DEFAULT NULL,
+  `shipping_address` text,
+  `billing_address` text,
+  `payment_status` varchar(200) DEFAULT NULL,
+  `shipping_date` timestamp NULL DEFAULT NULL,
+  `delivery_date` timestamp NULL DEFAULT NULL,
+  `tracking_number` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`id`, `customer_id`, `cart_id`, `order_date`, `status_id`, `total_amount`, `payment_method`, `shipping_address`, `billing_address`, `payment_status`, `shipping_date`, `delivery_date`, `tracking_number`) VALUES
+(1, 3, 1, '2024-09-30 21:16:51', 1, 400.00, 'Credit Card', 'Lorem Ipsum ', 'lorem Ipsum', 'Paid', NULL, '2024-10-31 07:00:00', 'TRACK-3-1727731472693');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_status`
+--
+
+CREATE TABLE `order_status` (
+  `id` int NOT NULL,
+  `status_name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `order_status`
+--
+
+INSERT INTO `order_status` (`id`, `status_name`) VALUES
+(1, 'Pending'),
+(2, 'Shipped'),
+(3, 'Delivered'),
+(4, 'Canceled'),
+(5, 'Refunded');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `permissions`
 --
 
@@ -98,7 +165,7 @@ CREATE TABLE `permissions` (
   `id` int NOT NULL,
   `name` varchar(50) NOT NULL,
   `description` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `permissions`
@@ -123,7 +190,7 @@ CREATE TABLE `products` (
   `brand_id` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `products`
@@ -133,8 +200,7 @@ INSERT INTO `products` (`id`, `name`, `description`, `price`, `SKU`, `category_i
 (1, 'Flask Handleer', 'Lorem Ipsum Descriptoin', 200.00, 'SKU-A3UZ16BEL', 1, 1, '2024-09-07 22:30:29', '2024-09-07 22:30:29'),
 (2, 'Flask Handleer', 'Lorem Ipsum Descriptoin', 200.00, 'SKU-BJ0QOEB9M', 1, 1, '2024-09-07 22:30:48', '2024-09-07 22:30:48'),
 (3, 'Flask Handleer', 'Lorem Ipsum Descriptoin', 200.00, 'SKU-WFABRAU45', 1, 1, '2024-09-07 22:45:49', '2024-09-07 22:45:49'),
-(4, 'Flask Handleer', 'Lorem Ipsum Descriptoin', 200.00, 'SKU-5K5JEXV7X', 1, 1, '2024-09-07 22:46:02', '2024-09-07 22:46:02'),
-(5, 'Bread Container', 'Lorem Ipsum Description', 200.00, 'SKU-EIAIRRKCK', NULL, NULL, '2024-09-07 22:51:28', '2024-09-07 22:51:28');
+(4, 'Flask Handleer', 'Lorem Ipsum Descriptoin', 200.00, 'SKU-5K5JEXV7X', 1, 1, '2024-09-07 22:46:02', '2024-09-07 22:46:02');
 
 -- --------------------------------------------------------
 
@@ -147,14 +213,7 @@ CREATE TABLE `product_images` (
   `product_id` int DEFAULT NULL,
   `image_url` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
-
---
--- Dumping data for table `product_images`
---
-
-INSERT INTO `product_images` (`id`, `product_id`, `image_url`, `created_at`) VALUES
-(1, 5, '/uploads/1725749488840.png', '2024-09-07 22:51:28');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -169,7 +228,7 @@ CREATE TABLE `refresh_tokens` (
   `expires_at` datetime NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `is_revoked` tinyint(1) DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `refresh_tokens`
@@ -180,7 +239,8 @@ INSERT INTO `refresh_tokens` (`id`, `user_id`, `token`, `expires_at`, `created_a
 (52, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiIwcmFmZmF5MTIzMTIzMTIzMTIzIiwiaWF0IjoxNzI1NzQ3MTkwfQ.Q8yjC5E1Kiryi1ZyWgX0XyTxl4i1UYqmUqwdNH6QfAA', '2024-09-08 15:13:11', '2024-09-07 22:13:10', 0),
 (53, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiIwcmFmZmF5MTIzMTIzMTIzMTIzIiwiaWF0IjoxNzI1NzQ4MTQxfQ.M846ELiawenvlNygPUUjarx-IT8o74xK0pT329w762o', '2024-09-08 15:29:01', '2024-09-07 22:29:01', 0),
 (54, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiIwcmFmZmF5MTIzMTIzMTIzMTIzIiwiaWF0IjoxNzI1NzQ5MDkwfQ.QI71r6w0hnv8_cckw5qOuQ9i9rT9XD-LjmmJNOlA-i0', '2024-09-08 15:44:51', '2024-09-07 22:44:50', 0),
-(55, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiIwcmFmZmF5MTIzMTIzMTIzMTIzIiwiaWF0IjoxNzI1NzQ5MTEwfQ.wosXUywEpdDcvzMFpn1_L2g31WySiBPxOBptERr0cdQ', '2024-09-08 15:45:11', '2024-09-07 22:45:10', 0);
+(55, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiIwcmFmZmF5MTIzMTIzMTIzMTIzIiwiaWF0IjoxNzI1NzQ5MTEwfQ.wosXUywEpdDcvzMFpn1_L2g31WySiBPxOBptERr0cdQ', '2024-09-08 15:45:11', '2024-09-07 22:45:10', 0),
+(56, 2, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiIxMjMiLCJpYXQiOjE3MjczODIwMTV9.Sw6yWGAS1J_Xcz4-mJpyLuN06Y9GEQ3hW3xzW1fBzhM', '2024-09-27 13:20:15', '2024-09-26 20:20:15', 0);
 
 -- --------------------------------------------------------
 
@@ -192,7 +252,7 @@ CREATE TABLE `roles` (
   `id` int NOT NULL,
   `name` varchar(50) NOT NULL,
   `description` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `roles`
@@ -214,7 +274,7 @@ CREATE TABLE `role_permissions` (
   `role_id` int NOT NULL,
   `permission_id` int NOT NULL,
   `granted_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `role_permissions`
@@ -236,14 +296,16 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `created_at`, `updated_at`) VALUES
-(1, '0raffay123123123123', '0.abdulraffay12312@gmail.com', 'Raffay@4146', '2024-09-07 21:56:58', '2024-09-07 21:56:58');
+(1, '0raffay123123123123', '0.abdulraffay12312@gmail.com', 'Raffay@4146', '2024-09-07 21:56:58', '2024-09-07 21:56:58'),
+(2, '123', 'abc@gmail.com', '123', '2024-09-26 20:20:09', '2024-09-26 20:20:09'),
+(3, '0raffay', '0.abdulraffay@gmail.com', '123', '2024-09-26 20:34:09', '2024-09-26 20:34:09');
 
 -- --------------------------------------------------------
 
@@ -256,7 +318,7 @@ CREATE TABLE `user_roles` (
   `user_id` int NOT NULL,
   `role_id` int NOT NULL,
   `assigned_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `user_roles`
@@ -295,6 +357,23 @@ ALTER TABLE `cart_items`
 --
 ALTER TABLE `categories`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `order_id` (`id`),
+  ADD KEY `customer_id` (`customer_id`),
+  ADD KEY `cart_id` (`cart_id`),
+  ADD KEY `status_id` (`status_id`);
+
+--
+-- Indexes for table `order_status`
+--
+ALTER TABLE `order_status`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `status_id` (`id`);
 
 --
 -- Indexes for table `permissions`
@@ -371,19 +450,31 @@ ALTER TABLE `brands`
 -- AUTO_INCREMENT for table `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `cart_items`
 --
 ALTER TABLE `cart_items`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `order_status`
+--
+ALTER TABLE `order_status`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `permissions`
@@ -407,7 +498,7 @@ ALTER TABLE `product_images`
 -- AUTO_INCREMENT for table `refresh_tokens`
 --
 ALTER TABLE `refresh_tokens`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -425,7 +516,7 @@ ALTER TABLE `role_permissions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `user_roles`
@@ -449,6 +540,14 @@ ALTER TABLE `carts`
 ALTER TABLE `cart_items`
   ADD CONSTRAINT `cart_items_ibfk_1` FOREIGN KEY (`cart_id`) REFERENCES `carts` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `cart_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `orders`
+--
+ALTER TABLE `orders`
+  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`cart_id`) REFERENCES `carts` (`id`),
+  ADD CONSTRAINT `orders_ibfk_3` FOREIGN KEY (`status_id`) REFERENCES `order_status` (`id`);
 
 --
 -- Constraints for table `products`
