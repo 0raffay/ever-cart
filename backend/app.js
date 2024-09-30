@@ -8,7 +8,7 @@ const port = process.env.PORT;
 
 function authenticateToken(req, res, next) {
   const path = req.path;
-  if (path === '/auth/login' || path === '/auth/register' || path == "/auth/refresh-token" || path == "/auth/revoke-token") {
+  if (path === '/auth/login' || path === '/auth/register' || path == "/auth/refresh-token" || path == "/auth/revoke-token" || path == "/") {
     return next();
   }
 
