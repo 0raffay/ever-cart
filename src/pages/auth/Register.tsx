@@ -49,7 +49,7 @@ export default function Register() {
         title: "Account Created Successfully.",
         variant: "success",
       });
-      navigate(ROUTES.home);
+      navigate(ROUTES.base);
     } catch (error) {
       toast({
         title: JSON.stringify(error),

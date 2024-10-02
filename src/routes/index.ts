@@ -10,4 +10,5 @@ export const ROUTES = {
   adminAddProduct: "/admin-dashboard/admin-add-product",
   adminProductsList: "/admin-dashboard/admin-all-products",
   adminOrderList: "/admin-dashboard/admin-order-list",
+  productDetails: "/product-details",
 };

@@ -1,6 +1,7 @@
 import productImg from "@/assets/images/frontend_assets/p_img1.png";
 import { Link } from "react-router-dom";
 import { baseUrl } from "@/constant/index";
+import { ROUTES } from "@/routes";
 
 interface ProductCardProps {
   img: string;
@@ -14,7 +15,7 @@ const ProductCard = ({
 }: ProductCardProps) => {
   return (
     <div className="productCard max-w-[300px] w-full group hover:cursor-pointer">
-      <Link to={`/${id}`}>
+      <Link to={`${ROUTES.productDetails}/${id}`}>
         <div className="img_wrap mb-2 overflow-hidden">
           <img
             src={baseUrl + product_images?.[0]?.image_url || productImg}

@@ -13,6 +13,7 @@ import AdminOrderList from "@/pages/admin/AdminOrderList";
 import About from "@/pages/about/About";
 import Contact from "@/pages/contact/Contact";
 import NotFound from "@/pages/NotFound";
+import ProductDetails from "@/pages/product/ProductDetails";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
           {
             path: ROUTES.contact,
             element: <Contact />,
+          },
+          {
+            path: ROUTES.productDetails + "/:productId?",
+            element: <ProductDetails />,
           },
         ],
       },
