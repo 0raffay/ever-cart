@@ -3,11 +3,6 @@ import { RootState } from "../store";
 import { selectToken } from "../features/auth/authSlice";
 
 export const apiSlice = createApi({
-<<<<<<< HEAD
-	reducerPath: "api",
-	baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:3000" }),
-	endpoints: () => ({}),
-=======
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
     baseUrl: "http://localhost:3000",
@@ -22,7 +17,6 @@ export const apiSlice = createApi({
     },
   }),
   endpoints: () => ({}),
->>>>>>> 9d5927d5d4bff8515bd369cd51fde448dc0b78eb
 });
 
 export default apiSlice;

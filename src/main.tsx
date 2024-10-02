@@ -6,12 +6,14 @@ import { PersistGate } from "redux-persist/integration/react";
 import { Toaster } from "@/components/ui/toaster";
 import { RouterProvider } from "react-router-dom";
 import router from "@/routes/router";
+import Loader from "./components/Loader";
 
 createRoot(document.getElementById("root")!).render(
-	<Provider store={store}>
-		<PersistGate loading={<div>loading...</div>} persistor={persistor}>
-			<RouterProvider router={router} />
-			<Toaster />
-		</PersistGate>
-	</Provider>
+  <Provider store={store}>
+    <PersistGate loading={<div>loading...</div>} persistor={persistor}>
+      <RouterProvider router={router} />
+      <Toaster />
+    </PersistGate>
+    <Loader />
+  </Provider>
 );

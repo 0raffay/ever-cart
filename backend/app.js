@@ -1,13 +1,13 @@
-require('dotenv').config();
-const express = require('express');
-const path = require('path');
+require("dotenv").config();
+const express = require("express");
+const path = require("path");
 const app = express();
-const jwt = require('jsonwebtoken');
-const cors = require('cors');
+const jwt = require("jsonwebtoken");
+const cors = require("cors");
 const port = process.env.PORT;
 
 function authenticateToken(req, res, next) {
-  const token = req.headers['authorization']?.split(' ')[1];
+  const token = req.headers["authorization"]?.split(" ")[1];
 
   if (!token) return res.sendStatus(401);
 
@@ -19,28 +19,27 @@ function authenticateToken(req, res, next) {
   });
 }
 
-
 /**
  * Middleware
  */
 app.use(cors());
-app.use(express.json())
+app.use(express.json());
 
 /**
  * Routes
  */
 
 app.use("/", require("./routes/root"));
-app.use('/auth', require("./routes/auth"))
-app.use('/products', require("./routes/products"))
-app.use('/categories', require("./routes/categories"))
-app.use('/brands', require("./routes/brands"))
-app.use('/roles', require("./routes/roles"))
-app.use('/permissions', require("./routes/permissions"))
-app.use('/users', require("./routes/users"))
-app.use('/cart', require("./routes/cart"))
-app.use('/order-statuses', require("./routes/orderStatus"))
-app.use('/orders', require("./routes/orders"))
+app.use("/auth", require("./routes/auth"));
+app.use("/products", require("./routes/products"));
+app.use("/categories", require("./routes/categories"));
+app.use("/brands", require("./routes/brands"));
+app.use("/roles", require("./routes/roles"));
+app.use("/permissions", require("./routes/permissions"));
+app.use("/users", require("./routes/users"));
+app.use("/cart", require("./routes/cart"));
+app.use("/order-statuses", require("./routes/orderStatus"));
+app.use("/orders", require("./routes/orders"));
 
 /**
  * Basic setup
@@ -49,13 +48,13 @@ app.use('/orders', require("./routes/orders"))
 app.use((err, req, res, next) => {
   console.error("Error:", err.message || err);
   res.status(err.status || 500).json({
-    message: err.message || 'Internal Server Error'
+    message: err.message || "Internal Server Error",
   });
 });
 
-app.use("/", express.static(path.join(__dirname, "public")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "views", "index.html"));
 });
 

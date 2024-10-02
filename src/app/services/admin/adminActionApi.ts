@@ -15,8 +15,20 @@ export const adminActionApi = apiSlice.injectEndpoints({
         url: "/products/get",
         method: "GET",
       }),
+      providesTags: ["delete-product"],
+    }),
+    deleteProductById: builder.mutation({
+      query: (id) => ({
+        url: `/products/delete/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["delete-product"],
     }),
   }),
 });
 
-export const { useAddProductMutation, useGetProductListQuery } = adminActionApi;
+export const {
+  useAddProductMutation,
+  useGetProductListQuery,
+  useDeleteProductByIdMutation,
+} = adminActionApi;

@@ -2,10 +2,12 @@ import { RootState } from "@/app/store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface UiState {
-  [key: string]: number | null; 
+  [key: string]: number | null;
 }
 
-const initialState: UiState = {};
+const initialState: UiState = {
+  showLoader: false,
+};
 
 const uiSlice = createSlice({
   name: "ui",
@@ -21,11 +23,26 @@ const uiSlice = createSlice({
       const { key, index } = action.payload;
       state[key] = state[key] === index ? null : index;
     },
+    handleShowLoader: (state) => {
+      state.showLoader = true;
+    },
+    handleHideLoader: (state) => {
+      state.showLoader = false;
+    },
   },
 });
 
-export const { openItem, closeItem, toggleItem } = uiSlice.actions;
+export const {
+  openItem,
+  closeItem,
+  toggleItem,
+  handleShowLoader,
+  handleHideLoader,
+} = uiSlice.actions;
 
-export const selectOpenItem = (key: string) => (state: RootState) => state.ui?.[key]
+export const selectOpenItem = (key: string) => (state: RootState) =>
+  state.ui?.[key];
+
+export const selectShowLoader = (state: RootState) => state.ui.showLoader;
 
 export default uiSlice.reducer;

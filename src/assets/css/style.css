@@ -277,3 +277,17 @@ table td {
   min-width: 50px;
   text-align: end;
 }
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loader svg {
+  animation: spin 1s linear infinite;
+  color: white;
+}
