@@ -8,8 +8,12 @@ import cartIcon from "@/assets/images/frontend_assets/cart_icon.png";
 
 import { LuMenu } from "react-icons/lu";
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { selectCartQuantity } from "@/app/features/product/productSlice";
 
 const Header = () => {
+  const cartQuantity = useSelector(selectCartQuantity);
+
   const [showMenu, setShowMenu] = useState(false);
 
   return (
@@ -79,9 +83,13 @@ const Header = () => {
           <Link to={ROUTES.register} className="h-6 w-6">
             <img src={personIcon} alt="Reload Page" className="h-full" />
           </Link>
-          <Button className="h-6 w-6" variant="icon" size="icon">
+          <Link to={ROUTES.cart} className="h-6 w-6 relative">
             <img src={cartIcon} alt="Reload Page" className="h-full" />
-          </Button>
+
+            <span className="absolute top-[-14px] right-[-10px] h-[23px] w-[23px] bg-black text-white rounded-full flex items-center justify-center text-[14px]">
+              {cartQuantity}
+            </span>
+          </Link>
         </div>
       </div>
 

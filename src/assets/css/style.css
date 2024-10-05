@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 * {
   font-family: "Poppins", system-ui;
 }
@@ -290,4 +294,20 @@ table td {
 .loader svg {
   animation: spin 1s linear infinite;
   color: white;
+}
+
+.modal {
+  display: none;
+  z-index: 100;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.proudctDetailSection .img_wrap img {
+  object-position: 0 0;
+}
+
+.cartSection .heading {
+  margin-bottom: 0px !important;
 }

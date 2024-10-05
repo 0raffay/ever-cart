@@ -11,4 +11,5 @@ export const ROUTES = {
   adminProductsList: "/admin-dashboard/admin-all-products",
   adminOrderList: "/admin-dashboard/admin-order-list",
   productDetails: "/product-details",
+  cart: "/cart",
 };

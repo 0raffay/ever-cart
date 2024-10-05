@@ -3,7 +3,7 @@ import React from "react";
 interface SkeletonProps {
   height: string;
   width: string;
-  className?: string; // Add className prop
+  className?: string;
   key?: number | string;
 }
 

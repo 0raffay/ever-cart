@@ -1,41 +1,64 @@
-const { validate } = require('../helpers');
-const database = require('../database');
-const { promise } = require('zod');
-const { getSingleProductById } = require('./productController');
-
+const { validate } = require("../helpers");
+const database = require("../database");
+const { promise } = require("zod");
+const { getSingleProductById } = require("./productController");
 
 const getUserCart = async (req, res) => {
   const { user_id } = req.params;
 
   try {
-    const checkCartQuery = `SELECT id FROM carts WHERE user_id = ? AND is_active != 0`;
+    // Check if the user has an active cart
+    const checkCartQuery = `SELECT id FROM carts WHERE user_id = ? AND is_active = 1`; // Ensures you're only looking for active carts
     const [[cart]] = await database.query(checkCartQuery, [user_id]);
 
     if (!cart) {
-      return res.status(404).json({ message: "Cart not found for this user", result: false });
+      return res
+        .status(404)
+        .json({ message: "Cart not found for this user", result: false });
     }
 
+    // Fetch cart items, product details, and images for the cart
     const getCartItemsQuery = `
-      SELECT ci.product_id, ci.quantity, ci.added_at, p.name, p.price, p.description
+      SELECT 
+        ci.product_id, ci.quantity, ci.added_at, 
+        p.name, p.price, p.description, 
+        GROUP_CONCAT(pi.image_url) AS images
       FROM cart_items ci
       JOIN products p ON ci.product_id = p.id
+      LEFT JOIN product_images pi ON pi.product_id = p.id
       WHERE ci.cart_id = ?
+      GROUP BY ci.product_id, ci.quantity, ci.added_at, p.name, p.price, p.description
     `;
 
     const [cartItems] = await database.query(getCartItemsQuery, [cart.id]);
 
+    // If no items are found, return an empty cart message
     if (cartItems.length === 0) {
-      return res.status(200).json({ message: "Your cart is empty", data: [], result: true });
+      return res
+        .status(200)
+        .json({ message: "Your cart is empty", data: [], result: true });
     }
 
-    res.status(200).json({
-      message: "User's cart", data: cartItems, result: true, cart_total: cartItems?.reduce((total, item) => {
-        return total + item?.quantity * item?.price;
-      }, 0)
-    });
+    // Calculate total price
+    const cartTotal = cartItems.reduce((total, item) => {
+      return total + item.quantity * item.price;
+    }, 0);
 
+    // Return cart data with cart total and images
+    return res.status(200).json({
+      message: "User's cart",
+      data: cartItems.map((item) => ({
+        ...item,
+        images: item.images ? item.images.split(",") : [], // Convert image URLs into an array
+      })),
+      result: true,
+      cart_total: cartTotal,
+    });
   } catch (error) {
-    return res.status(500).json({ message: "Database error", error: error.message, result: false });
+    console.error("Error fetching user cart:", error); // Add error logging
+    return res
+      .status(500)
+      .json({ message: "Database error", error: error.message, result: false });
   }
 };
 
@@ -44,14 +67,25 @@ const addOrUpdateCartItem = async (cart_id, product_id, quantity) => {
   const updateCartItemQuery = `UPDATE cart_items SET quantity = ? WHERE cart_id = ? AND product_id = ?`;
   const insertCartItemQuery = `INSERT INTO cart_items (cart_id, product_id, quantity, added_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)`;
 
-  const [[existingCartItem]] = await database.query(checkCartItemQuery, [cart_id, product_id]);
+  const [[existingCartItem]] = await database.query(checkCartItemQuery, [
+    cart_id,
+    product_id,
+  ]);
 
   if (existingCartItem) {
     const newQuantity = existingCartItem.quantity + quantity;
-    const [updateResult] = await database.query(updateCartItemQuery, [newQuantity, cart_id, product_id]);
+    const [updateResult] = await database.query(updateCartItemQuery, [
+      newQuantity,
+      cart_id,
+      product_id,
+    ]);
     return updateResult.affectedRows > 0 ? "updated" : null;
   } else {
-    const [insertResult] = await database.query(insertCartItemQuery, [cart_id, product_id, quantity]);
+    const [insertResult] = await database.query(insertCartItemQuery, [
+      cart_id,
+      product_id,
+      quantity,
+    ]);
     return insertResult.affectedRows > 0 ? "inserted" : null;
   }
 };
@@ -60,28 +94,42 @@ const addToCart = async (req, res) => {
   const { user_id, product_id, quantity } = req.body;
 
   try {
-    const checkCartQuery = `SELECT id FROM carts WHERE user_id = ?`;
-    const insertCartQuery = `INSERT INTO carts (user_id, created_at) VALUES (?, CURRENT_TIMESTAMP)`;
+    // Check if a cart exists for the user (including inactive carts)
+    const checkCartQuery = `SELECT id, is_active FROM carts WHERE user_id = ?`;
+    const insertCartQuery = `INSERT INTO carts (user_id, is_active, created_at) VALUES (?, 1, CURRENT_TIMESTAMP)`;
+    const activateCartQuery = `UPDATE carts SET is_active = 1 WHERE id = ?`;
 
     let [[cart]] = await database.query(checkCartQuery, [user_id]);
 
     if (!cart) {
+      // If no cart exists, create a new one
       const [cartResult] = await database.query(insertCartQuery, [user_id]);
       cart = { id: cartResult.insertId }; // Use the inserted cart's ID
+    } else if (cart.is_active === 0) {
+      // If the cart exists but is inactive, activate it
+      await database.query(activateCartQuery, [cart.id]);
+      cart.is_active = 1; // Update the cart's status in the code
     }
 
+    // Add or update the cart item
     const action = await addOrUpdateCartItem(cart.id, product_id, quantity);
 
     if (action === "inserted") {
-      res.status(200).json({ message: "Product has been added to cart", result: true });
+      res
+        .status(200)
+        .json({ message: "Product has been added to cart", result: true });
     } else if (action === "updated") {
-      res.status(200).json({ message: "Product quantity updated in the cart", result: true });
+      res.status(200).json({
+        message: "Product quantity updated in the cart",
+        result: true,
+      });
     } else {
       res.status(400).json({ message: "Something went wrong", result: false });
     }
-
   } catch (error) {
-    return res.status(500).json({ message: "Database error", error: error.message, result: false });
+    return res
+      .status(500)
+      .json({ message: "Database error", error: error.message, result: false });
   }
 };
 
@@ -99,13 +147,19 @@ const updateCartItem = async (req, res) => {
     const action = await addOrUpdateCartItem(cart.id, product_id, quantity);
 
     if (action === "updated") {
-      res.status(200).json({ message: "Product quantity updated in the cart", result: true });
+      res.status(200).json({
+        message: "Product quantity updated in the cart",
+        result: true,
+      });
     } else {
-      res.status(400).json({ message: "Failed to update cart item", result: false });
+      res
+        .status(400)
+        .json({ message: "Failed to update cart item", result: false });
     }
-
   } catch (error) {
-    return res.status(500).json({ message: "Database error", error: error.message, result: false });
+    return res
+      .status(500)
+      .json({ message: "Database error", error: error.message, result: false });
   }
 };
 
@@ -117,47 +171,77 @@ const deleteProductFromCart = async (req, res) => {
     const [[cart]] = await database.query(checkCartQuery, [user_id]);
 
     if (!cart) {
-      return res.status(404).json({ message: "Cart not found for this user", result: false });
+      return res
+        .status(404)
+        .json({ message: "Cart not found for this user", result: false });
     }
 
     const deleteProductQuery = `DELETE FROM cart_items WHERE cart_id = ? AND product_id = ?`;
-    const [result] = await database.query(deleteProductQuery, [cart.id, product_id]);
+    const [result] = await database.query(deleteProductQuery, [
+      cart.id,
+      product_id,
+    ]);
 
     if (result.affectedRows > 0) {
-      res.status(200).json({ message: "Product removed from cart", result: true });
+      res
+        .status(200)
+        .json({ message: "Product removed from cart", result: true });
     } else {
-      res.status(404).json({ message: "Product not found in cart", result: false });
+      res
+        .status(404)
+        .json({ message: "Product not found in cart", result: false });
     }
-
   } catch (error) {
-    return res.status(500).json({ message: "Database error", error: error.message, result: false });
+    return res
+      .status(500)
+      .json({ message: "Database error", error: error.message, result: false });
   }
 };
 
 const removeAllItemsFromCart = async (req, res) => {
-  const { user_id } = req.params;
+  const { user_id } = req.params; // Get user_id from params
 
   try {
-    // Check if the user has a cart
-    const checkCartQuery = `SELECT id FROM carts WHERE user_id = ?`;
+    // Check if the user has an active cart
+    const checkCartQuery = `SELECT id FROM carts WHERE user_id = ? AND is_active = 1`;
     const [[cart]] = await database.query(checkCartQuery, [user_id]);
 
+    console.log("Cart check result:", cart); // Log the cart check result
+
     if (!cart) {
-      return res.status(404).json({ message: "Cart not found for this user", result: false });
+      return res
+        .status(404)
+        .json({ message: "Cart not found for this user", result: false });
     }
+
+    console.log("Cart ID found:", cart.id); // Log the cart ID
+
+    // Check if there are items in the cart before deleting
+    const checkItemsQuery = `SELECT * FROM cart_items WHERE cart_id = ?`;
+    const [items] = await database.query(checkItemsQuery, [cart.id]);
+
+    console.log("Items in cart:", items); // Log items found in the cart
 
     // Delete all items from the cart
     const deleteAllItemsQuery = `DELETE FROM cart_items WHERE cart_id = ?`;
     const [result] = await database.query(deleteAllItemsQuery, [cart.id]);
 
-    if (result.affectedRows > 0) {
-      res.status(200).json({ message: "All items removed from cart", result: true });
-    } else {
-      res.status(404).json({ message: "No items found in cart", result: false });
-    }
+    console.log("Delete result:", result); // Log the result of the delete operation
 
+    if (result.affectedRows > 0) {
+      return res
+        .status(200)
+        .json({ message: "All items removed from cart", result: true });
+    } else {
+      return res
+        .status(404)
+        .json({ message: "No items found in cart to remove", result: false });
+    }
   } catch (error) {
-    return res.status(500).json({ message: "Database error", error: error.message, result: false });
+    console.error("Error in removeAllItemsFromCart:", error); // Log the error for debugging
+    return res
+      .status(500)
+      .json({ message: "Database error", error: error.message, result: false });
   }
 };
 
@@ -168,7 +252,7 @@ const calculateCartTotal = async (cart_id) => {
     const quantity = item?.quantity ? parseInt(item?.quantity, 10) : 0;
     const price = item?.product?.price ? parseFloat(item?.product?.price) : 0;
 
-    return total + (quantity * price);
+    return total + quantity * price;
   }, 0);
 
   return amount;
@@ -178,21 +262,33 @@ const getUserCartById = async (user_id) => {
   const query = `SELECT * FROM  carts WHERE user_id = ? AND is_active != 0`;
   const [[rows]] = await database.query(query, [user_id]);
   return rows || 0;
-}
-
+};
 
 const getCartItems = async (cart_id) => {
   const query = `SELECT * FROM cart_items WHERE cart_id = ?`;
   const [items] = await database.query(query, [cart_id]);
-  const itemsWithProducts = await Promise.all(items?.map(item => {
-    return getSingleProductById(item?.id);
-  }))
-  return items?.map((item, index) => {
-    return {
-      ...item,
-      product: itemsWithProducts?.[index]
-    }
-  }) || 0;
-}
+  const itemsWithProducts = await Promise.all(
+    items?.map((item) => {
+      return getSingleProductById(item?.id);
+    })
+  );
+  return (
+    items?.map((item, index) => {
+      return {
+        ...item,
+        product: itemsWithProducts?.[index],
+      };
+    }) || 0
+  );
+};
 
-module.exports = { calculateCartTotal, addOrUpdateCartItem, addToCart, updateCartItem, getUserCart, deleteProductFromCart, removeAllItemsFromCart, getUserCartById };
+module.exports = {
+  calculateCartTotal,
+  addOrUpdateCartItem,
+  addToCart,
+  updateCartItem,
+  getUserCart,
+  deleteProductFromCart,
+  removeAllItemsFromCart,
+  getUserCartById,
+};

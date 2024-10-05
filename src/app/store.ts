@@ -6,17 +6,20 @@ import apiSlice from "@/app/services/api";
 import authReducer from "@/app/features/auth/authSlice";
 import uiSlice from "@/app/features/ui/uiSlice";
 import adminAddProductSlice from "@/app/features/admin/adminAddProductSilce";
+import productSliceReducer from "./features/product/productSlice";
 
 const rootReducer = combineReducers({
   auth: authReducer,
   ui: uiSlice,
   adminProductSliceState: adminAddProductSlice,
   [apiSlice.reducerPath]: apiSlice.reducer,
+  productSlice: productSliceReducer,
 });
 
 const persistConfig = {
   key: "root",
   storage,
+  blacklist: [apiSlice.reducerPath],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
