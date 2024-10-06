@@ -15,6 +15,8 @@ import Contact from "@/pages/contact/Contact";
 import NotFound from "@/pages/NotFound";
 import ProductDetails from "@/pages/product/ProductDetails";
 import Cart from "@/pages/cart/Cart";
+import PlaceOrder from "@/pages/place-order/PlaceOrder";
+import Order from "@/pages/order/Order";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +45,14 @@ const router = createBrowserRouter([
           {
             path: ROUTES.cart,
             element: <Cart />,
+          },
+          {
+            path: ROUTES.placeOrder,
+            element: <PlaceOrder />,
+          },
+          {
+            path: ROUTES.myOrders,
+            element: <Order />,
           },
         ],
       },

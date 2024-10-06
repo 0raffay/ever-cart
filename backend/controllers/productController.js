@@ -2,7 +2,7 @@ const { validate } = require("../helpers");
 const database = require("../database");
 
 const getAllProducts = async (req, res) => {
-  const query = `SELECT * FROM products`;
+  const query = `SELECT * FROM products`;  // This already includes quantity if the table has the column
   try {
     const [rows] = await database.query(query);
     if (rows) {
@@ -31,14 +31,16 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+
 const addProduct = async (req, res) => {
-  const { name, description, price, categoryId, brandId } = req.body;
+  const { name, description, price, categoryId, brandId, quantity } = req.body; // Add quantity
   const files = req.files;
 
   const error = validate([
     [name, "name"],
     [description, "description"],
     [price, "price"],
+    [quantity, "quantity"], // Validate quantity
   ]);
 
   if (!error.isValid) {
@@ -48,8 +50,8 @@ const addProduct = async (req, res) => {
   const SKU = "SKU-" + Math.random().toString(36).substr(2, 9).toUpperCase();
 
   const insertProductQuery = `
-   INSERT INTO products (name, description, price, SKU, category_id, brand_id, created_at, updated_at)
-   VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+   INSERT INTO products (name, description, price, SKU, category_id, brand_id, quantity, created_at, updated_at)
+   VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)  -- Insert quantity
  `;
 
   try {
@@ -60,6 +62,7 @@ const addProduct = async (req, res) => {
       SKU,
       categoryId,
       brandId,
+      quantity,  // Pass quantity
     ]);
 
     if (!result) {
@@ -95,6 +98,7 @@ const addProduct = async (req, res) => {
       .json({ message: "Database error", error: error.message, result: false });
   }
 };
+
 
 const getSingleProduct = async (req, res) => {
   const { id } = req.params;

@@ -12,4 +12,6 @@ export const ROUTES = {
   adminOrderList: "/admin-dashboard/admin-order-list",
   productDetails: "/product-details",
   cart: "/cart",
+  placeOrder: "/place-order",
+  myOrders: "/orders",
 };

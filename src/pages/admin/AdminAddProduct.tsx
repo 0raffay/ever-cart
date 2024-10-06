@@ -20,7 +20,6 @@ import {
 const labelArr = Array.from({ length: 4 });
 const buttonArray = ["s", "m", "l", "xl", "xxl"];
 
-
 const AdminAddProduct = () => {
   const dispatch = useDispatch();
   const { toast } = useToast();
@@ -56,6 +55,7 @@ const AdminAddProduct = () => {
     imageFiles.forEach((file) => {
       formData.append("images", file);
     });
+    formData.append("quantity", formFields?.["quantity"]);
 
     addProduct(formData);
     dispatch(setFormFields(formFields));
@@ -65,7 +65,7 @@ const AdminAddProduct = () => {
     const file = e.target.files[0];
 
     setImageFile((prev) => [...prev, file]);
-    
+
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       dispatch(setProductImg(imageUrl));
@@ -114,7 +114,7 @@ const AdminAddProduct = () => {
               key={index}
             >
               <img
-                src={savedProductImg[index] || uploadImg}
+                src={savedProductImg[index].split("blog:").join() || uploadImg}
                 alt="Upload"
                 className="object-cover h-full w-full"
               />
@@ -144,6 +144,19 @@ const AdminAddProduct = () => {
             value={formFields?.["product_price"] || ""}
             type="number"
             id="productPrice"
+          />
+        </div>
+        <div className="field_wrap mb-4">
+          <Label htmlFor="productQuantity">Product Quantity</Label>
+          <Input
+            placeholder="Type here"
+            variant="tertiary"
+            size="lg"
+            className="max-w-[500px] w-full"
+            onChange={(e) => handleChange("quantity", e.target.value)}
+            value={formFields?.["quantity"] || ""}
+            type="number"
+            id="productQuantity"
           />
         </div>
         <div className="field_wrap mb-5">

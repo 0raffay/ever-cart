@@ -18,6 +18,7 @@ import {
   setDeleteAllQuantity,
   setDeleteCartQuantity,
 } from "@/app/features/product/productSlice";
+import CartTotal from "@/components/cart/CartTotal";
 
 function Cart() {
   const dispatch = useDispatch();
@@ -74,7 +75,7 @@ function Cart() {
     content = cartData?.data?.map((item, index) => {
       return (
         <div
-          className="cartOrderCard border-b border-gray-300 border-solid pb-6 mb-5 flex items-center justify-between"
+          className="cartOrderCard border-b border-gray-300 border-solid pb-6 mb-5 grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-3 justify-center items-center"
           key={index}
         >
           <div className="flex items-start justify-start gap-4">
@@ -104,7 +105,7 @@ function Cart() {
               value={item?.quantity}
             />
           </div>
-          <div className="button_wrap">
+          <div className="button_wrap text-end">
             <Button
               variant="primary"
               size="sm"
@@ -130,7 +131,7 @@ function Cart() {
       });
     }
 
-    if (cartSuccess) {
+    if (cartDelSuccess) {
       toast({
         title: "Product Deleted Successfully!!",
         variant: "success",
@@ -194,6 +195,12 @@ function Cart() {
         </div>
         <div className="cartList">{content}</div>
       </section>
+
+      {cartData?.data?.length && cartData?.data ? (
+        <section>
+          <CartTotal showButton productData={cartData?.data} />
+        </section>
+      ) : <section className="my-[65px]"></section>}
     </main>
   );
 }

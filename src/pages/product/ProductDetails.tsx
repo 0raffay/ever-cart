@@ -56,8 +56,18 @@ const ProductDetails = () => {
       toast({
         title: "Please Add Quantity",
         variant: "destructive",
-        duration: 500,
+        duration: 1000,
       });
+      return;
+    }
+
+    if (quantity > productDetData?.data?.quantity) {
+      toast({
+        title: `We have limited stock for this product only ${productDetData?.data?.quantity} remaining!!`,
+        variant: "destructive",
+        duration: 1000,
+      });
+
       return;
     }
 
@@ -137,6 +147,10 @@ const ProductDetails = () => {
               </span>
               <p className="text-gray-600 text-[14px] font-medium mb-2">
                 {productDetData?.data?.description}
+              </p>
+              <p className="text-yellow-500 text-[14px] mb-2">
+                We have limited Stock for this product only{" "}
+                {productDetData?.data?.quantity} is remaining!!
               </p>
               <div className="mb-4">
                 <span className="text-black text-[14px] font-medium mb-4">

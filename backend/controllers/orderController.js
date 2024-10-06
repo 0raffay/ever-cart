@@ -1,32 +1,91 @@
-const database = require('../database');
-const { getUserCart, getUserCartById, calculateCartTotal } = require('./cartController');
+const database = require("../database");
+const {
+  getUserCart,
+  getUserCartById,
+  calculateCartTotal,
+} = require("./cartController");
 
 const getAllOrders = async (req, res) => {
   const query = `SELECT * FROM orders`;
   try {
     const [rows] = await database.query(query);
-    res.status(200).json({ message: "All Orders", data: (rows || []), result: true })
+    res
+      .status(200)
+      .json({ message: "All Orders", data: rows || [], result: true });
   } catch (error) {
-    return res.status(500).json({ message: "Database error", error: error.message, result: false });
+    return res
+      .status(500)
+      .json({ message: "Database error", error: error.message, result: false });
   }
-}
+};
 
 const getUserOrders = async (req, res) => {
-  const { id } = req.params
-  const query = `SELECT * FROM orders WHERE customer_id = ?`;
+  const { id } = req.params;
+  const query = `
+    SELECT 
+      o.order_id, 
+      o.order_date, 
+      p.product_name, 
+      p.product_image, 
+      oi.quantity, 
+      oi.price, 
+      sh.address AS shipping_address, 
+      ba.address AS billing_address, 
+      pm.method AS payment_method
+    FROM 
+      orders o
+    JOIN 
+      order_items oi ON o.order_id = oi.order_id
+    JOIN 
+      products p ON oi.product_id = p.product_id
+    JOIN 
+      addresses sh ON o.shipping_address_id = sh.address_id
+    JOIN 
+      addresses ba ON o.billing_address_id = ba.address_id
+    JOIN 
+      payments pm ON o.payment_id = pm.payment_id
+    WHERE 
+      o.customer_id = ?;
+  `;
+
   try {
     const [rows] = await database.query(query, [id]);
-    res.status(200).json({ message: "All Orders of User", data: (rows || []), result: true })
+
+    // Map the data into an array of objects with the required format
+    const formattedOrders = rows.map((row) => ({
+      orderId: row.order_id,
+      orderDate: row.order_date,
+      productName: row.product_name,
+      productImage: row.product_image,
+      quantity: row.quantity,
+      price: row.price,
+      shippingAddress: row.shipping_address,
+      billingAddress: row.billing_address,
+      paymentMethod: row.payment_method,
+    }));
+
+    res
+      .status(200)
+      .json({
+        message: "All Orders of User",
+        data: formattedOrders,
+        result: true,
+      });
   } catch (error) {
-    return res.status(500).json({ message: "Database error", error: error.message, result: false });
+    return res
+      .status(500)
+      .json({ message: "Database error", error: error.message, result: false });
   }
-}
+};
 
 const placeOrder = async (req, res) => {
-  const { user_id, payment_method, shipping_address, billing_address } = req.body;
+  const { user_id, payment_method, shipping_address, billing_address } =
+    req.body;
 
   if (!user_id || !payment_method || !shipping_address || !billing_address) {
-    return res.status(400).json({ message: "All fields are required", result: false });
+    return res
+      .status(400)
+      .json({ message: "All fields are required", result: false });
   }
 
   const orderQuery = `
@@ -55,7 +114,7 @@ const placeOrder = async (req, res) => {
       payment_method,
       shipping_address,
       billing_address,
-      "Paid"
+      "Paid",
     ]);
 
     const orderId = result.insertId;
@@ -63,22 +122,24 @@ const placeOrder = async (req, res) => {
     return res.status(201).json({
       message: "Order placed successfully",
       data: { order_id: orderId },
-      result: true
+      result: true,
     });
-
   } catch (error) {
-    console.log("error", error)
-    return res.status(500).json({ message: "Database error", error: error.message, result: false });
+    console.log("error", error);
+    return res
+      .status(500)
+      .json({ message: "Database error", error: error.message, result: false });
   }
 };
-
 
 const updateOrder = async (req, res) => {
   const { id } = req.params;
   const { status_id, delivery_date, user_id } = req.body;
 
   if (!status_id) {
-    return res.status(400).json({ message: "Status ID is required", result: false });
+    return res
+      .status(400)
+      .json({ message: "Status ID is required", result: false });
   }
 
   try {
@@ -91,13 +152,22 @@ const updateOrder = async (req, res) => {
       WHERE id = ?
     `;
 
-    await database.query(updateQuery, [status_id, new Date(delivery_date), trackingNumber, id]);
+    await database.query(updateQuery, [
+      status_id,
+      new Date(delivery_date),
+      trackingNumber,
+      id,
+    ]);
 
-    res.status(200).json({ message: "Order updated successfully", result: true });
+    res
+      .status(200)
+      .json({ message: "Order updated successfully", result: true });
   } catch (error) {
     console.error("Error updating order:", error);
-    return res.status(500).json({ message: "Database error", error: error.message, result: false });
+    return res
+      .status(500)
+      .json({ message: "Database error", error: error.message, result: false });
   }
 };
 
-module.exports = { getAllOrders, getUserOrders, placeOrder, updateOrder }
+module.exports = { getAllOrders, getUserOrders, placeOrder, updateOrder };

@@ -43,6 +43,19 @@ const productApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["user-cart"],
     }),
+    placeOrder: builder.mutation({
+      query: (payload) => ({
+        url: "/orders/place-order",
+        method: "POST",
+        body: payload,
+      }),
+    }),
+    getOrdersOfUser: builder.query({
+      query: (id) => ({
+        url: `/orders/get/${id}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -53,5 +66,7 @@ export const {
   useGetUserCartQuery,
   useDeleteProductUserCartMutation,
   useDeleteAllCartItemsMutation,
+  usePlaceOrderMutation,
+  useGetOrdersOfUserQuery,
 } = productApiSlice;
 export default productApiSlice;
