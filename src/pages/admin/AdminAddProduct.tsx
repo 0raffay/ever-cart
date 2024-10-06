@@ -114,7 +114,7 @@ const AdminAddProduct = () => {
               key={index}
             >
               <img
-                src={savedProductImg[index].split("blog:").join() || uploadImg}
+                src={savedProductImg[index]?.split("blog:").join() || uploadImg}
                 alt="Upload"
                 className="object-cover h-full w-full"
               />

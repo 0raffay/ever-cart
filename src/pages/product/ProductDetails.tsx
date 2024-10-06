@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import Skeleton from "@/components/Skeleton";
-import { baseUrl } from "@/constant/index";
+import { baseUrl } from "@/constant";
 import { useDispatch } from "react-redux";
 import { setAddCartQuantity } from "@/app/features/product/productSlice";
 

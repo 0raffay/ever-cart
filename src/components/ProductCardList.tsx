@@ -4,15 +4,22 @@ import ProductCard from "./ProductCard";
 import Skeleton from "./Skeleton";
 import { toast, useToast } from "@/hooks/use-toast";
 
-interface ProductCardListProps {
-  heading: string;
-  desc: string | null;
+interface productsDataProps {
   products: {
     img: string;
     desc: string;
     price: string | number;
     id: string | number | null;
   };
+}
+
+interface ProductCardListProps {
+  heading?: string;
+  desc?: string | null;
+  loading: boolean;
+  success: boolean;
+  error: any;
+  products: productsDataProps[];
 }
 
 const ProductCardList = ({
@@ -32,7 +39,7 @@ const ProductCardList = ({
     ));
     console.log("loading is working");
   } else if (success) {
-    content = products?.map((item, index) => {
+    content = products?.map((item: any, index: number) => {
       return <ProductCard item={item} key={index} />;
     });
   } else if (error) {
@@ -59,7 +66,7 @@ const ProductCardList = ({
               "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Non voluptates est accusamus sequi molestiae nostrum."}
           </p>
         </div>
-        <div className="flex items-center justify-start gap-7 flex-wrap">
+        <div className="flex items-center lg:justify-start justify-center lg:gap-7 gap-10 flex-wrap">
           {content}
         </div>
       </section>

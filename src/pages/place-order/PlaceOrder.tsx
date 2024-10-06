@@ -77,9 +77,9 @@ const PlaceOrder = () => {
         duration: 1000,
       });
 
-      resetCart({
-        user_id: 4,
-      });
+      // resetCart({
+      //   user_id: 4,
+      // });
       dispatch(setDeleteAllQuantity());
       navigate(ROUTES.myOrders);
     }

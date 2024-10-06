@@ -1,8 +1,8 @@
 import React from "react";
 
 interface SkeletonProps {
-  height: string;
-  width: string;
+  height?: string;
+  width?: string;
   className?: string;
   key?: number | string;
 }

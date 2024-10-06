@@ -21,60 +21,88 @@ const getAllOrders = async (req, res) => {
 
 const getUserOrders = async (req, res) => {
   const { id } = req.params;
-  const query = `
+
+  const orderQuery = `
     SELECT 
-      o.order_id, 
-      o.order_date, 
-      p.product_name, 
-      p.product_image, 
-      oi.quantity, 
-      oi.price, 
-      sh.address AS shipping_address, 
-      ba.address AS billing_address, 
-      pm.method AS payment_method
-    FROM 
-      orders o
-    JOIN 
-      order_items oi ON o.order_id = oi.order_id
-    JOIN 
-      products p ON oi.product_id = p.product_id
-    JOIN 
-      addresses sh ON o.shipping_address_id = sh.address_id
-    JOIN 
-      addresses ba ON o.billing_address_id = ba.address_id
-    JOIN 
-      payments pm ON o.payment_id = pm.payment_id
-    WHERE 
-      o.customer_id = ?;
+      o.id AS order_id,
+      o.customer_id,
+      o.cart_id,
+      o.order_date,
+      o.status_id,
+      o.total_amount,
+      o.payment_method,
+      o.shipping_address,
+      o.billing_address,
+      o.payment_status,
+      o.shipping_date,
+      o.delivery_date,
+      o.tracking_number,
+      c.id AS cart_id,
+      c.user_id AS cart_user_id,
+      c.is_active,
+      c.created_at AS cart_created_at,
+      c.updated_at AS cart_updated_at
+    FROM orders o
+    LEFT JOIN carts c ON o.cart_id = c.id
+    WHERE o.customer_id = ?
+  `;
+
+  const productQuery = `
+    SELECT 
+      p.id AS product_id,
+      p.name AS product_name,
+      p.price AS product_price,
+      pi.image_url AS product_image_url,
+      ci.quantity AS user_quantity  -- Get the quantity the user added
+    FROM cart_items ci
+    JOIN products p ON ci.product_id = p.id
+    JOIN product_images pi ON p.id = pi.product_id
+    WHERE ci.cart_id = ?
   `;
 
   try {
-    const [rows] = await database.query(query, [id]);
+    // Fetch the orders by customer_id
+    const [orders] = await database.query(orderQuery, [id]);
 
-    // Map the data into an array of objects with the required format
-    const formattedOrders = rows.map((row) => ({
-      orderId: row.order_id,
-      orderDate: row.order_date,
-      productName: row.product_name,
-      productImage: row.product_image,
-      quantity: row.quantity,
-      price: row.price,
-      shippingAddress: row.shipping_address,
-      billingAddress: row.billing_address,
-      paymentMethod: row.payment_method,
-    }));
+    const productIds = await Promise.all(
+      orders?.map(async (item) => await getCart(item?.cart_id))
+    );
 
-    res
-      .status(200)
-      .json({
-        message: "All Orders of User",
-        data: formattedOrders,
-        result: true,
-      });
+    console.log("product ids", productIds)
+
+    if (orders.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No orders found for this user", result: false });
+    }
+
+    // Fetch products for each order's cart_id
+    const ordersWithProducts = await Promise.all(
+      orders.map(async (order) => {
+        const [products] = await database.query(productQuery, [order.cart_id]);
+        return { ...order, ...new Set(products) }; // Combine order and products data
+      })
+    );
+
+    res.status(200).json({
+      message: "All Orders of User",
+      data: ordersWithProducts,
+      result: true,
+    });
   } catch (error) {
     return res
       .status(500)
       .json({ message: "Database error", error: error.message, result: false });
+  }
+};
+
+const getCart = async (cartId) => {
+  const query = "SELECT * FROM cart_items WHERE cart_id = ?";
+  try {
+    const [items] = await database.query(query, [cartId]);
+    console.log("items", items);
+  } catch (error) {
+    console.error("error", error);
   }
 };
 

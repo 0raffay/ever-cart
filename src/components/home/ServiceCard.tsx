@@ -4,7 +4,12 @@ interface ServiceCardProps {
   desc: string;
 }
 
-const ServiceCard = ({ item: { icon, heading, desc } }: ServiceCardProps) => {
+interface ItemProps {
+  item: ServiceCardProps;
+}
+
+const ServiceCard = ({ item }: ItemProps) => {
+  const { icon, heading, desc } = item;
   return (
     <div className="flex items-center flex-col justify-center">
       <div className="icon_wrap mb-3">

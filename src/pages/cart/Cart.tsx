@@ -1,5 +1,4 @@
 import Heading from "@/components/Heading";
-import productImg from "@/assets/images/frontend_assets/p_img1.png";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,7 +7,7 @@ import {
   useGetUserCartQuery,
 } from "@/app/services/product/productApiSlice";
 import Skeleton from "@/components/Skeleton";
-import { baseUrl } from "@/constant/index";
+import { baseUrl } from "@/constant";
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useDispatch } from "react-redux";
@@ -200,7 +199,9 @@ function Cart() {
         <section>
           <CartTotal showButton productData={cartData?.data} />
         </section>
-      ) : <section className="my-[65px]"></section>}
+      ) : (
+        <section className="my-[65px]"></section>
+      )}
     </main>
   );
 }

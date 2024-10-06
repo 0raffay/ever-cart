@@ -7,7 +7,7 @@ import {
 import Skeleton from "@/components/Skeleton";
 import CustomTable from "@/components/CustomTable";
 import { useToast } from "@/hooks/use-toast";
-import { baseUrl } from "@/constant/index";
+import { baseUrl } from "@/constant";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { handleHideLoader, handleShowLoader } from "@/app/features/ui/uiSlice";
@@ -31,15 +31,13 @@ const AdminProductList = () => {
     deleteProductId,
     {
       isLoading: deleteProductLoading,
-      data: deleteProductData,
-      error: deleteProductError,
       isSuccess: deleteProductSuccess,
     },
   ] = useDeleteProductByIdMutation();
 
   const { toast } = useToast();
 
-  const handleDeleteProduct = async (id) => {
+  const handleDeleteProduct = async (id: string | number) => {
     if (!id) {
       return;
     }
@@ -53,7 +51,7 @@ const AdminProductList = () => {
       <Skeleton height="h-[137px]" width="w-[1200px]" key={index} />
     ));
   } else if (isSuccess && productList) {
-    content = productList?.data?.map((item, index) => {
+    content = productList?.data?.map((item: any, index: number) => {
       return (
         <tr
           key={index}
@@ -90,14 +88,14 @@ const AdminProductList = () => {
       );
     });
   } else if (isError) {
-    console.error("error", error?.error);
+    console.error("error", error);
   }
 
   useEffect(() => {
     if (!isError) return;
     toast({
       title: "We are having an error",
-      description: `Error: ${error?.error}`,
+      description: `Error: ${error}`,
       variant: "destructive",
     });
   }, [isError, error]);

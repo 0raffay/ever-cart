@@ -11,16 +11,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-black hover:bg-white hover:border-black hover:border hover:text-black text-white",
+          "bg-black hover:bg-white hover:border-black hover:border hover:text-black text-white lg:text-[16px] text-[14px]",
         secondary:
-          "bg-[#F2F5F6] text-black hover:bg-black hover:border hover:text-white",
+          "bg-[#F2F5F6] text-black hover:bg-black hover:border hover:text-white lg:text-[16px] text-[14px]",
         icon: "bg-tranparent",
       },
       size: {
         default: "h-[45px] min-w-[200px] text-[16px]",
-        sm: "h-[40px] text-[16px] min-w-[150px]",
-        md: "h-[45px] text-[16px] min-w-[180px]",
-        lg: "h-[55px] rounded-md min-w-[200px] text-[16px]",
+        sm: "h-[40px] text-[16px] lg:min-w-[150px] w-auto lg:px-0 px-2",
+        md: "h-[45px] text-[16px] lg:min-w-[180px] w-auto lg:px-0 px-2",
+        lg: "h-[55px] rounded-md lg:min-w-[200px] w-auto text-[16px] lg:px-0 px-2",
         icon: "h-9 w-9",
       },
     },

@@ -3,9 +3,12 @@ import AdminHeader from "./AdminHeader";
 import AdminSidebar from "./AdminSidebar";
 import addIcon from "@/assets/images/admin_assets/add_icon.png";
 import listItemBox from "@/assets/images/admin_assets/order_icon.png";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet, Routes, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+
   const sidebarMenuList = [
     {
       menuItemText: "Add Items",
@@ -23,6 +26,10 @@ const AdminDashboard = () => {
       menuItemImg: listItemBox,
     },
   ];
+
+  useEffect(() => {
+    navigate(ROUTES.adminAddProduct);
+  }, []);
 
   return (
     <>

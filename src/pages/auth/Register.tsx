@@ -20,8 +20,6 @@ export default function Register() {
     resolver: zodResolver(registerSchema),
   });
 
-
-  // Define refs for each input
   const userNameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -40,7 +38,7 @@ export default function Register() {
     }
 
     try {
-       await register({
+      await register({
         email,
         password,
         username,
@@ -49,7 +47,7 @@ export default function Register() {
         title: "Account Created Successfully.",
         variant: "success",
       });
-      navigate(ROUTES.base);
+      navigate(ROUTES.login);
     } catch (error) {
       toast({
         title: JSON.stringify(error),

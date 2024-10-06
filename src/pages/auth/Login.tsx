@@ -39,17 +39,19 @@ export default function Login() {
         password: password,
       }).unwrap();
 
-      dispatch(setCredentials({ token: response.token, user: response.user }));
+      dispatch(setCredentials({ token: response.token, user: response.userId }));
       navigate(ROUTES.base);
       toast({
         title: "You have logged in successfully.",
         variant: "success",
+        duration: 1000,
       });
     } catch (err) {
       toast({
         title: "Error",
         description: `We are having an error ${error}`,
         variant: "destructive",
+        duration: 1000,
       });
     }
   };
